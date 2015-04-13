@@ -1,0 +1,5 @@
+{
+	"name": "qpm",
+	"bin": "qpm.q",
+	"preinstall": "ls"
+}

@@ -1,0 +1,70 @@
+#!/bin/sh
+
+PREFIX=/usr/local
+
+for arg in "$@"; do
+	case "$arg" in
+    	--prefix=*)
+        	PREFIX=`echo $arg | sed 's/--prefix=//'`
+        	;;
+        --license=*)
+        	LIC=`echo $arg | sed 's/--license=//'`
+        	;;
+        --64bit=*)
+        	SIXFOUR=`echo $arg | sed 's/--64bit=//'`
+        	;;
+		--help)
+			echo 'usage: ./configure [options]'
+			echo 'options:'
+			echo '  --prefix=<path>: installation prefix'
+			echo '  --license=<path>: location of license file'
+			echo '  --64bit=<path>: location of 64 bit binary'
+			echo 'all invalid options are silently ignored'
+			exit 0
+			;;
+	esac
+done
+
+WARNINGS="please run the following:\n"
+HASWARNING=0
+
+echo 'checking for 32bit dependencies q32...'
+echo 'checking for 32 bit glibc...'
+
+ldd bin/l32/q > /dev/null 2>&1
+if [ "$?" = 1 ]; then 
+	echo 'no 32 bit glibc found'
+	HASWARNING=1
+	WARNINGS="$WARNINGS\tsudo apt-get install libc-i386 zlib1g:i386"
+else
+	echo '32 bit glibc found'
+fi
+
+if [ "$HASWARNING" = 1 ]; then
+	echo $WARNINGS
+	exit 1
+fi
+
+echo 'generating q shortcut'
+echo "export QPREFIX=$PREFIX" > bin/q
+echo "export QHOME=$PREFIX/lib/q" >> bin/q
+echo 'export QLIB=$HOME/lib/q' >> bin/q
+echo "export QLIC=$PREFIX/lib/q/lic" >> bin/q
+if [ -n "$LIC" ] && [ -n "$SIXFOUR" ]
+then 
+	echo "copying license file and 64bit binary to package"
+	if [ ! -f "$LIC" ]; then echo "license found not found at $LIC"; exit 1; fi
+	if [ ! -f "$SIXFOUR" ]; then echo "64bit binary not found at $SIXFOUR"; exit 1; fi
+	cp $LIC lic
+	cp $SIXFOUR bin/l64/q
+	echo "$PREFIX/bin/q64 "'$@' >> bin/q
+else 
+	echo "$PREFIX/bin/q32 "'$@' >> bin/q
+fi
+
+echo 'generating makefile...'
+echo "PREFIX = $PREFIX" > Makefile
+if [ -n "$LIC" ]; then echo "LIC = $LIC" >> Makefile; fi
+if [ -n "$SIXFOUR" ]; then echo "SIXFOUR = $SIXFOUR" >> Makefile; fi
+cat Makefile.in >> Makefile
+echo 'configuration complete, type make install to install'
