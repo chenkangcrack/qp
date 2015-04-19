@@ -13,12 +13,16 @@ for arg in "$@"; do
         --64bit=*)
         	SIXFOUR=`echo $arg | sed 's/--64bit=//'`
         	;;
+       	--no32bit)
+			NOTHREETWO=1
+			;;
 		--help)
 			echo 'usage: ./configure [options]'
 			echo 'options:'
 			echo '  --prefix=<path>: installation prefix'
 			echo '  --license=<path>: location of license file'
 			echo '  --64bit=<path>: location of 64 bit binary'
+			echo '  --no32bit: dont install 32bit version'
 			echo 'all invalid options are silently ignored'
 			exit 0
 			;;
@@ -28,21 +32,30 @@ done
 WARNINGS="please run the following:\n"
 HASWARNING=0
 
-echo 'checking for 32bit dependencies q32...'
-echo 'checking for 32 bit glibc...'
-
-ldd bin/l32/q > /dev/null 2>&1
-if [ "$?" = 1 ]; then 
-	echo 'no 32 bit glibc found'
-	HASWARNING=1
-	WARNINGS="$WARNINGS\tsudo apt-get install libc-i386 zlib1g:i386"
-else
-	echo '32 bit glibc found'
+#check to see if we are even installing anything
+if [ \( -z "$LIC" -o -z "$SIXFOUR" \) ] && [ -n "$NOTHREETWO" ]; then
+	echo 'Not installing 32bit and not installing 64bit - please specify license and 64bit binary files to install 64bit only'
+	echo 'run ./configure --help for more information'
+	exit 1
 fi
 
-if [ "$HASWARNING" = 1 ]; then
-	echo $WARNINGS
-	exit 1
+if [ -z "$NOTHREETWO" ]; then
+	echo 'checking for 32bit dependencies q32...'
+	echo 'checking for 32 bit glibc...'
+
+	ldd bin/l32/q > /dev/null 2>&1
+	if [ "$?" = 1 ]; then 
+		echo 'no 32 bit glibc found'
+		HASWARNING=1
+		WARNINGS="$WARNINGS\tsudo apt-get install libc-i386 zlib1g:i386"
+	else
+		echo '32 bit glibc found'
+	fi
+
+	if [ "$HASWARNING" = 1 ]; then
+		echo $WARNINGS
+		exit 1
+	fi
 fi
 
 echo 'generating q shortcut'
@@ -66,5 +79,6 @@ echo 'generating makefile...'
 echo "PREFIX = $PREFIX" > Makefile
 if [ -n "$LIC" ]; then echo "LIC = $LIC" >> Makefile; fi
 if [ -n "$SIXFOUR" ]; then echo "SIXFOUR = $SIXFOUR" >> Makefile; fi
+if [ -n "$NOTHREETWO"]; then echo "NOTHREETWO = $NOTHREETWO" >> Makefile; fi
 cat Makefile.in >> Makefile
 echo 'configuration complete, type make install to install'

@@ -1,0 +1,14 @@
+{
+	"conn":{
+		"url":"https://github.com/yang-guo/conn.git"
+	},
+	"timer":{
+		"url":"https://github.com/yang-guo/timer.git"
+	},
+	"threads":{
+		"url":"https://github.com/yang-guo/threads.git"
+	},
+	"curl":{
+		"url":"https://github.com/yang-guo/curl.git"
+	}
+}

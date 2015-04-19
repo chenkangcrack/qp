@@ -20,4 +20,4 @@ For example, if we have the following:
 we are telling the installer to run ls before installation, do the default installation, run no postinstallation procedures, then install qpm.q as a binary.
 If this was run as "qpm.q install" then the library would be installed into $QLIB, and the binary would be installed into $HOME/bin, however if this was run as "qpm.q install -global", then the library would be installed into $QHOME, and the binary would be installed into $PREFIX/bin (usually /usr/local/bin)
 
-uninstall would target 
+uninstall targets the chosen package and works much in the same way as install.  For example, "qpm.q uninstall package" would uninstall the package in $QLIB (local package), while "qpm.q uninstall package -global" would uninstall the package in $QHOME (global package)

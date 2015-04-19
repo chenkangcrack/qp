@@ -1,17 +1,33 @@
+
+
 install:{[pkg;args]
-	if[0 = count pkg;-1 "attempting to install package in current directory...";install_local[pkg;args];:0];
-	$[pkg like "[http|https]*";
+	if[0 = count pkg;-1 "attempting to install package in current directory...";install_local[pkg;args];-1 "installation successful";:0];
+	ret:$[pkg like "[http|https]*";
 		[-1 "attempting to install package from ",pkg;install_http[pkg;args]];
 		[-1 "attempting to install package ",pkg;install_regular[pkg;args]]
 	];
+	$[ret~0;-1 "installation successful";err_exit "installation failed"];
+	:ret;
  }
 
-install_http:{[pkg;args]
-	-1 "install regular"
+install_http:{[url;args]
+	pkg:{{"." sv $["git"~last x;-1_x;x]}"." vs last "/" vs x} url;
+	system "cd /tmp";
+	remove_fileorfolder hsym`$pkg;
+	@[system;"git clone ",url;{err_exit "cannot git clone package, error with ",x}];
+	system "cd ",pkg;
+	:install_common[args];
  }
 
 install_regular:{[pkg;args]
-	-1 "install regular";
+	dir:$["/"=first pkg;pkg;system["cd"],"/",pkg];
+	if[0h <> type key `$":",dir;system"cd ",dir;:install_common[args]];
+	-1 "package not found in local folders - searching repository";
+	if[99h <> type repo:get_repository[];err_exit "no valid repositories found"];
+	if[not (`$pkg) in key repo;err_exit "package is not found in current repository - try refreshing it"];
+	url:repo[`$pkg][`url];
+	-1 "package found in repository - installing from repository ",url;
+	:install_http[url;args];
  }
 
 install_local:{[pkg;args]
@@ -55,3 +71,10 @@ install_common:{[args]
 	];
 	:0
  }
+
+get_repository:{
+	if[0h = type key hsym`$getenv[`QHOME],"/qpm/repository.json";:()];
+	:@[(.j.k raze read0@);hsym`$getenv[`QHOME],"/qpm/repository.json";{()}]
+ }
+
+remove_fileorfolder:{$[0h = t:type key x;:0;0h < t;[.z.s each `$((string[x]),"/"),/:string key x;hdel x];hdel x]}

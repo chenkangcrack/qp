@@ -28,6 +28,7 @@ To install, run the following:
 3. ./configure
 	- to install it in a non-default location, set the --prefix=<path> argument
 	- add --license=<path>/<filename> and --64bit=<path>/<filename> to add in 64 bit q to the installation
+	- add --no32bit to NOT install the 32bit version
 4. make && make install
 If BOTH LIC and SIXFOUR are defined then the default q will be 64bit, otherwise it will use the 32bit installation
 
@@ -41,8 +42,13 @@ e.g.
 ## qp namespace
 The qp namespace simplifies the loading of external packages and makes writing packages easier.  These are the core features
 - load packages via .qp.require "PACKAGENAME"
-	- The loading logic will try to find the package in current working directory, then $QLIB, then $HOME/q (which is usually same as $QLIB), and finally $QHOME.  That is, more local packages will have priority over more global packages (current working directory over $QLIB, and $QLIB over $QHOME)
+	- The loading logic will try to find the package in current working directory, then $QLIB, then $HOME/q, and finally $QHOME.  That is, more local packages will have priority over more global packages (current working directory over $QLIB, and $QLIB over $QHOME)
 	- Packages loaded this way will be cached into .qp.cache.  Once a package is cached it won't try to reload the package again, so if you want to manually reload you will need to flush the cache of that package name
 - load custom scripts via .qp.require "/PATH/TO/SCRIPT.q"
 	- Loads the package at the path name
 	- The script name will not be cached, so reloading via .qp.require is fine
+
+## TODO
+- add ability to auto-download dependencies to qpm.json
+- add direct download from git
+- add central repository

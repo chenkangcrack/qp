@@ -1,4 +1,5 @@
 PREFIX = /usr/local
+NOTHREETWO = 
 ifndef PREFIX
 $(error PREFIX is not set)
 endif
@@ -20,8 +21,10 @@ ifneq "$(and $(LIC), $(SIXFOUR))" ""
 endif
 
 install32: installcommon
+ifndef NOTHREETWO
 	cp bin/l32/q $(BINF)/q32
 	chmod 755 $(BINF)/q32
+endif
 
 installqpm: installcommon
 	cp -r qpm $(LIBF)/q
@@ -39,7 +42,9 @@ installcommon:
 	chmod 755 $(BINF)/q
 
 uninstall32: uninstallcommon
+ifndef NOTHREETWO
 	rm -rf $(BINF)/q32
+endif
 
 uninstall64: uninstallcommon
 ifneq "$(and $(LIC), $(SIXFOUR))" ""
