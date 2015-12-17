@@ -1,5 +1,0 @@
-export QPREFIX=/home/yang
-export QHOME=/home/yang/lib/q
-export QLIB=$HOME/lib/q
-export QLIC=/home/yang/lib/q/lic
-/home/yang/bin/q32 $@
