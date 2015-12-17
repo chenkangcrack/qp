@@ -1,2 +1,3 @@
 *.lic
 Makefile
+bin/q
