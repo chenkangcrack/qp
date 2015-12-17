@@ -70,9 +70,9 @@ then
 	if [ ! -f "$SIXFOUR" ]; then echo "64bit binary not found at $SIXFOUR"; exit 1; fi
 	cp $LIC lic
 	cp $SIXFOUR bin/l64/q
-	echo "$PREFIX/bin/q64 "'$@' >> bin/q
+	echo "$PREFIX/bin/q64 "'$@' -q >> bin/q
 else 
-	echo "$PREFIX/bin/q32 "'$@' >> bin/q
+	echo "$PREFIX/bin/q32 "'$@' -q >> bin/q
 fi
 
 echo 'generating makefile...'
